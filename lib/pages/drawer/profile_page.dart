@@ -16,17 +16,17 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
 
-  final formKey = GlobalKey<FormState>();
-  bool _isLoading = false;
   AuthService authService = AuthService();
   DatabaseService databaseService = DatabaseService();
+  final formKey = GlobalKey<FormState>();
+  bool _isLoading = false;
   String fullName = '';
   String email = '';
   String phone = '';
   String gender = '';
   String profession = '';
-
-  String dropDownValue = 'One';
+  String place = "";
+  final genderGroups = ['Male', 'Female', 'Others'];
 
   @override
   void initState() {
@@ -40,9 +40,34 @@ class _ProfilePageState extends State<ProfilePage> {
         email = value!;
       });
     });
-    await HelperFunctions.getUserNameFromSF().then((val) {
+
+    await HelperFunctions.getUserNameFromSF().then((value) {
       setState(() {
-        fullName = val!;
+        fullName = value!;
+      });
+    });
+
+    await HelperFunctions.getUserPhoneFromSF().then((value) {
+      setState(() {
+        phone = value!;
+      });
+    });
+
+    await HelperFunctions.getUserGenderFromSF().then((value) {
+      setState(() {
+        gender = value!;
+      });
+    });
+
+    await HelperFunctions.getUserProfessionFromSF().then((value) {
+      setState(() {
+        profession = value!;
+      });
+    });
+
+    await HelperFunctions.getUserPlaceFromSF().then((value) {
+      setState(() {
+        place = value!;
       });
     });
   }
@@ -80,7 +105,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
       body: SingleChildScrollView(
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
           child: Form(
             key: formKey,
             child: GestureDetector(
@@ -98,9 +123,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           fontSize: 25, fontWeight: FontWeight.w500),
                     ),
                   ),
-
-                  const SizedBox(height: 15,),
-
+                  const SizedBox(height: 10,),
                   Center(
                     child: Stack(
                       children: [
@@ -154,62 +177,33 @@ class _ProfilePageState extends State<ProfilePage> {
                       ],
                     ),
                   ),
-
-                  const SizedBox(height: 15,),
-
+                  const SizedBox(height: 30,),
                   buildTextField("Full Name", fullName),
                   buildTextField("E-mail", email),
                   buildTextField("Phone", phone),
-
                   Container(
-                    width: 400,
+                    width: 370,
                     height: 50,
-                    decoration: const BoxDecoration(
-                        border: Border(
-                          bottom: BorderSide(
-                            color: Colors.grey,
-                            width: 1.0,
-                          ),
-                        )
-                    ),
-                    child: Expanded(
-                      child: DropdownButton(
-                          isExpanded: true,
-                          value: dropDownValue,
-                          items: const [
-                            DropdownMenuItem<String>(
-                              value: 'One',
-                              child: Text("Male"),
-                            ),
-                            DropdownMenuItem<String>(
-                              value: 'Two',
-                              child: Text("Female"),
-                            ),
-                            DropdownMenuItem<String>(
-                              value: 'Three',
-                              child: Text("Other"),
-                            ),
-                          ],
-                          onChanged: (String? newValue) {
-                            setState(() {
-                              dropDownValue = newValue!;
-                            });
-                          }
-                      ),
+                    child: DropdownButtonFormField(
+                        decoration: textInputDecoration.copyWith(
+                          labelText: "Gender",
+                        ),
+                        items: genderGroups.map((e) =>
+                            DropdownMenuItem(
+                              child: Text(e),
+                              value: e,
+                            )).toList(),
+                        onChanged: (val) {
+                          gender = val as String;
+                        }
                     ),
                   ),
-
-
                   const SizedBox(height: 30,),
-
                   buildTextField("Profession", profession),
-
-                  const SizedBox(height: 15,),
-
+                  buildTextField("Place", place),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-
                       ElevatedButton(
                         onPressed: () {
                           nextScreen(context, HomePage());
@@ -233,7 +227,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
                       ElevatedButton(
                         onPressed: () {
-                          saveDataToFirebase();
+
                         },
                         style: ElevatedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(horizontal: 50),
@@ -257,7 +251,6 @@ class _ProfilePageState extends State<ProfilePage> {
                     ],
                   ),
 
-
                 ],
               ),
             ),
@@ -274,35 +267,12 @@ class _ProfilePageState extends State<ProfilePage> {
         controller: TextEditingController(
             text: placeholder
         ),
-        decoration: InputDecoration(
-          contentPadding: const EdgeInsets.only(bottom: 3),
+        decoration: textInputDecoration.copyWith(
+          contentPadding: const EdgeInsets.only(bottom: 3, left: 8),
           labelText: labelText,
-          floatingLabelBehavior: FloatingLabelBehavior.always,
         ),
 
       ),
     );
-  }
-
-  Future<void> saveDataToFirebase() async {
-    if (formKey.currentState!.validate()) {
-      setState(() {
-        _isLoading = true;
-      });
-
-      try {
-        await databaseService.savingUserData(email);
-
-        setState(() {
-          _isLoading = false;
-        });
-
-        // Show a success message or perform any other actions
-      } catch (error) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
-    }
   }
 }

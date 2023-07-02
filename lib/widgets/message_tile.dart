@@ -49,7 +49,7 @@ class _MessageTileState extends State<MessageTile> {
             ),
             color: widget.sentByMe
                 ? Theme.of(context).primaryColor
-                : Colors.grey[700]),
+                : Colors.green),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

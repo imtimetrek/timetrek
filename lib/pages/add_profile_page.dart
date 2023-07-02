@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:timetrek/helper/helper_function.dart';
+import 'package:timetrek/pages/drawer/home_page.dart';
 import 'package:timetrek/services/database_services.dart';
+import 'package:timetrek/widgets/widgets.dart';
 
 class AddProfile extends StatefulWidget {
   const AddProfile({super.key});
@@ -18,8 +20,8 @@ class _AddProfileState extends State<AddProfile> {
   String phone = '';
   String gender = '';
   String profession = '';
-
-  String dropDownValue = 'One';
+  String place = "";
+  final genderGroups = ['Male', 'Female', 'Others'];
 
   @override
   void initState() {
@@ -122,58 +124,32 @@ class _AddProfileState extends State<AddProfile> {
                   ),
 
                   const SizedBox(height: 15,),
-
                   buildTextField("Full Name", fullName),
                   buildTextField("Phone", phone),
-
                   Container(
-                    width: 400,
+                    width: 370,
                     height: 50,
-                    decoration: const BoxDecoration(
-                        border: Border(
-                          bottom: BorderSide(
-                            color: Colors.grey,
-                            width: 1.0,
-                          ),
-                        )
-                    ),
-                    child: Expanded(
-                      child: DropdownButton(
-                          isExpanded: true,
-                          value: dropDownValue,
-                          items: const [
-                            DropdownMenuItem<String>(
-                              value: 'One',
-                              child: Text("Male"),
-                            ),
-                            DropdownMenuItem<String>(
-                              value: 'Two',
-                              child: Text("Female"),
-                            ),
-                            DropdownMenuItem<String>(
-                              value: 'Three',
-                              child: Text("Other"),
-                            ),
-                          ],
-                          onChanged: (String? newValue) {
-                            setState(() {
-                              dropDownValue = newValue!;
-                            });
-                          }
-                      ),
+                    child: DropdownButtonFormField(
+                        decoration: textInputDecoration.copyWith(
+                          labelText: "Gender",
+                        ),
+                        items: genderGroups.map((e) =>
+                            DropdownMenuItem(
+                              child: Text(e),
+                              value: e,
+                            )).toList(),
+                        onChanged: (val) {
+                          gender = val as String;
+                        }
                     ),
                   ),
-
-
                   const SizedBox(height: 30,),
-
                   buildTextField("Profession", profession),
-
+                  buildTextField("Place", place),
                   const SizedBox(height: 15,),
-
                   ElevatedButton(
                     onPressed: () {
-                      saveDataToFirebase();
+                      nextScreenReplace(context, HomePage());
                     },
                     style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(horizontal: 50),
@@ -194,7 +170,6 @@ class _AddProfileState extends State<AddProfile> {
                     ),
                   ),
 
-
                 ],
               ),
             ),
@@ -211,7 +186,7 @@ class _AddProfileState extends State<AddProfile> {
         controller: TextEditingController(
             text: placeholder
         ),
-        decoration: InputDecoration(
+        decoration: textInputDecoration.copyWith(
           contentPadding: const EdgeInsets.only(bottom: 3),
           labelText: labelText,
           floatingLabelBehavior: FloatingLabelBehavior.always,
@@ -221,13 +196,5 @@ class _AddProfileState extends State<AddProfile> {
     );
   }
 
-  Future<void> saveDataToFirebase() async {
-    if (formKey.currentState!.validate()) {
-      setState(() {
-        _isLoading = true;
-      });
 
-      await databaseService.savingUserData(email);
-    }
-  }
 }

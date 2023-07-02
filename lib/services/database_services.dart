@@ -15,10 +15,10 @@ class DatabaseService {
     return await userCollection.doc(uid).set({
       "fullName": "",
       "email": email,
+      "groups": [],
       "phone": "",
       "gender": "",
       "profession": "",
-      "groups": [],
       "profilePic": "",
       "uid": uid,
     });

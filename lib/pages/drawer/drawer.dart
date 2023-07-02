@@ -10,9 +10,7 @@ import 'package:timetrek/widgets/widgets.dart';
 
 class SideDrawer extends StatefulWidget {
 
-  SideDrawer({
-    super.key,
-  });
+  SideDrawer({super.key});
 
   @override
   State<SideDrawer> createState() => _SideDrawerState();
@@ -21,9 +19,8 @@ class SideDrawer extends StatefulWidget {
 class _SideDrawerState extends State<SideDrawer> {
 
   AuthService authService = AuthService();
-  int _selectedIndex = 0;
+  int _selectedIndex = 2;
   String fullName = '';
-  String email = '';
 
   @override
   void initState() {
@@ -31,11 +28,6 @@ class _SideDrawerState extends State<SideDrawer> {
     gettingUserData();
   }
   gettingUserData() async {
-    await HelperFunctions.getUserEmailFromSF().then((value) {
-      setState(() {
-        email = value!;
-      });
-    });
     await HelperFunctions.getUserNameFromSF().then((val) {
       setState(() {
         fullName = val!;
